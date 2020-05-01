@@ -9,17 +9,18 @@ var map = new mapboxgl.Map({
   center: [-73.915355,40.771302],
 })
 
+// draw plugin
 var Draw = new MapboxDraw();
-
-// Map#addControl takes an optional second argument to set the position of the control.
-// If no position is specified the control defaults to `top-right`. See the docs
-// for more details: https://docs.mapbox.com/mapbox-gl-js/api/#map#addcontrol
-
 map.addControl(Draw, 'top-left');
 
+// geojson data
 var busUrl = 'https://raw.githubusercontent.com/nikikokkinos/Data/master/CD22BusRoutes.geojson'
 var truckUrl = 'https://raw.githubusercontent.com/nikikokkinos/Data/master/CD22TruckRoutes.geojson'
 var hospitalUrl = 'https://raw.githubusercontent.com/nikikokkinos/Data/master/CD22Hospital.geojson'
+
+// empty vars for hover
+var hoveredBusId = null
+var hoveredTruckId = null
 
 map.on('load', function() {
 
@@ -39,9 +40,9 @@ map.on('load', function() {
 
     function(error, image) { if (error) throw error;
 
-      map.addImage('cross', image)
+    map.addImage('cross', image)
 
-      map.addSource('hospital', {
+    map.addSource('hospital', {
       'type': 'geojson',
       'data': hospitalUrl,
       'generateId': true
@@ -58,7 +59,12 @@ map.on('load', function() {
         },
       'paint': {
           'line-color': 'blue',
-          'line-width': 3,
+          'line-width': [
+            'case',
+            ['boolean', ['feature-state', 'hover'], false],
+            7,
+            3
+          ],
         },
     })
 
@@ -73,10 +79,14 @@ map.on('load', function() {
         },
       'paint': {
           'line-color': 'black',
-          'line-width': 3,
+          'line-width': [
+            'case',
+            ['boolean', ['feature-state', 'hover'], false],
+            7,
+            3
+          ],
         },
     })
-
 
     map.addLayer({
       'id': 'hospitalCD22',
@@ -89,6 +99,62 @@ map.on('load', function() {
       })
 
     })
+
+    // bus hover effect
+  map.on('mousemove', 'busCD22', function(e) {
+    map.getCanvas().style.cursor = 'pointer'
+      if (e.features.length > 0) {
+        if (hoveredBusId) {
+        map.setFeatureState(
+          { source: 'bus', id: hoveredBusId },
+          { hover: false }
+        )
+        }
+      hoveredBusId = e.features[0].id
+      map.setFeatureState(
+          { source: 'bus', id: hoveredBusId },
+          { hover: true }
+        )
+      }
+    })
+
+  map.on('mouseleave', 'busCD22', function() {
+    if (hoveredBusId) {
+      map.setFeatureState(
+      { source: 'bus', id: hoveredBusId },
+      { hover: false }
+      )
+      }
+      hoveredBusId = null
+  })
+
+  map.on('mousemove', 'truckCD22', function(e) {
+    map.getCanvas().style.cursor = 'pointer'
+      if (e.features.length > 0) {
+        if (hoveredTruckId) {
+        map.setFeatureState(
+          { source: 'truck', id: hoveredTruckId },
+          { hover: false }
+        )
+        }
+      hoveredTruckId = e.features[0].id
+      map.setFeatureState(
+          { source: 'truck', id: hoveredTruckId },
+          { hover: true }
+        )
+      }
+    })
+
+  map.on('mouseleave', 'truckCD22', function() {
+    if (hoveredTruckId) {
+      map.setFeatureState(
+      { source: 'truck', id: hoveredTruckId },
+      { hover: false }
+      )
+      }
+      hoveredTruckId = null
+  })
+
 
   var radioButton = $('#layerToggle')
 
