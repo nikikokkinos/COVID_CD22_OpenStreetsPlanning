@@ -9,6 +9,14 @@ var map = new mapboxgl.Map({
   center: [-73.915355,40.771302],
 })
 
+var Draw = new MapboxDraw();
+
+// Map#addControl takes an optional second argument to set the position of the control.
+// If no position is specified the control defaults to `top-right`. See the docs
+// for more details: https://docs.mapbox.com/mapbox-gl-js/api/#map#addcontrol
+
+map.addControl(Draw, 'top-left');
+
 var busUrl = 'https://raw.githubusercontent.com/nikikokkinos/Data/master/CD22BusRoutes.geojson'
 var truckUrl = 'https://raw.githubusercontent.com/nikikokkinos/Data/master/CD22TruckRoutes.geojson'
 var hospitalUrl = 'https://raw.githubusercontent.com/nikikokkinos/Data/master/CD22Hospital.geojson'
