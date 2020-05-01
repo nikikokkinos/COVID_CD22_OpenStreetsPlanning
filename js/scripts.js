@@ -22,6 +22,19 @@ var hospitalUrl = 'https://raw.githubusercontent.com/nikikokkinos/Data/master/CD
 var hoveredBusId = null
 var hoveredTruckId = null
 
+// popup attributes
+var markerHeight = 20, markerRadius = 10, linearOffset = 25;
+var popupOffsets = {
+  'top': [0, 0],
+  'top-left': [0,0],
+  'top-right': [0,0],
+  'bottom': [0, -markerHeight],
+  'bottom-left': [linearOffset, (markerHeight - markerRadius + linearOffset) * -1],
+  'bottom-right': [-linearOffset, (markerHeight - markerRadius + linearOffset) * -1],
+  'left': [markerRadius, (markerHeight - markerRadius) * -1],
+  'right': [-markerRadius, (markerHeight - markerRadius) * -1]
+}
+
 map.on('load', function() {
 
   map.addSource('bus', {
@@ -100,7 +113,7 @@ map.on('load', function() {
 
     })
 
-    // bus hover effect
+  // bus hover effect
   map.on('mousemove', 'busCD22', function(e) {
     map.getCanvas().style.cursor = 'pointer'
       if (e.features.length > 0) {
@@ -128,6 +141,7 @@ map.on('load', function() {
       hoveredBusId = null
   })
 
+  // truck hover effect
   map.on('mousemove', 'truckCD22', function(e) {
     map.getCanvas().style.cursor = 'pointer'
       if (e.features.length > 0) {
@@ -155,9 +169,49 @@ map.on('load', function() {
       hoveredTruckId = null
   })
 
+  // popup effects
+  var busPopup = new mapboxgl.Popup({
+    offset: popupOffsets,
+    closeButton: false,
+    closeOnClick: false
+  })
 
+  map.on('click', 'busCD22', function(e) {
+    var busHTML = 'Bus:' + ' ' + e.features[0].properties.route_id
+    busPopup
+      .setLngLat(e.lngLat)
+      .setHTML( busHTML )
+      .addTo(map)
+  })
+
+  map.on('mouseleave', 'busCD22', function() {
+    map.getCanvas().style.cursor = '';
+    busPopup.remove();
+  })
+
+  var truckPopup = new mapboxgl.Popup({
+    offset: popupOffsets,
+    closeButton: false,
+    closeOnClick: false
+  })
+
+  map.on('click', 'truckCD22', function(e) {
+    var truckHTML = 'Street:' + ' ' + e.features[0].properties.Street
+    truckPopup
+      .setLngLat(e.lngLat)
+      .setHTML( truckHTML )
+      .addTo(map)
+  })
+
+  map.on('mouseleave', 'truckCD22', function() {
+    map.getCanvas().style.cursor = '';
+    truckPopup.remove();
+  })
+
+
+
+  // layerToggle functions
   var radioButton = $('#layerToggle')
-
     radioButton.on("click", function () {
       if (document.getElementById('MountSinaiQueens').checked) {
           map.setLayoutProperty('hospitalCD22', 'visibility', 'visible')
