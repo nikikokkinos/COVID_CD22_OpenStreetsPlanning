@@ -75,9 +75,15 @@ map.on('load', function() {
           'line-width': [
             'case',
             ['boolean', ['feature-state', 'hover'], false],
-            7,
-            3
-          ],
+              8,
+              4
+            ],
+            'line-opacity': [
+              'case',
+              ['boolean', ['feature-state', 'hover'], false],
+              1,
+              .5
+            ],
         },
     })
 
@@ -95,9 +101,15 @@ map.on('load', function() {
           'line-width': [
             'case',
             ['boolean', ['feature-state', 'hover'], false],
-            7,
-            3
-          ],
+              8,
+              4
+            ],
+            'line-opacity': [
+              'case',
+              ['boolean', ['feature-state', 'hover'], false],
+              1,
+              .5
+            ],
         },
     })
 
